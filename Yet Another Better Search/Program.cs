@@ -16,7 +16,7 @@ namespace Yet_Another_Better_Search
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new BrowseForm());
         }
     }
 }
