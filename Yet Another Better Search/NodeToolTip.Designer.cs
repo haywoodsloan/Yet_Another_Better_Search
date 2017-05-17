@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.toolTipText = new System.Windows.Forms.Label();
+            this.displayTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // toolTipText
@@ -40,6 +42,10 @@
             this.toolTipText.Size = new System.Drawing.Size(65, 13);
             this.toolTipText.TabIndex = 0;
             this.toolTipText.Text = "Default Text";
+            // 
+            // displayTimer
+            // 
+            this.displayTimer.Interval = 500;
             // 
             // NodeToolTip
             // 
@@ -65,5 +71,6 @@
         #endregion
 
         private System.Windows.Forms.Label toolTipText;
+        private System.Windows.Forms.Timer displayTimer;
     }
 }
