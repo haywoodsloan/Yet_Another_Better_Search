@@ -103,6 +103,16 @@ namespace Yet_Another_Better_Search
             }
         }
 
+        private void resultTree_OnMouseMove(object sender, MouseEventArgs e)
+        {
+            TreeNode mouseNode = resultTree.GetNodeAt(e.Location);
+
+            if (mouseNode == null)
+            {
+                toolTip.Hide();
+            }
+        }
+
         private void resultTree_OnMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -121,10 +131,12 @@ namespace Yet_Another_Better_Search
                 {
                     nodeContextMenu.Tag = e.Node;
                     nodeContextMenu.Show(resultTree.PointToScreen(e.Location));
+
+                    NodeToolTip toolTip = new NodeToolTip();
                 }
             }
         }
-        
+
         private async Task<TreeNode> createNodeFor(string rootPath, int depth)
         {
             TreeNode rootNode = new TreeNode(depth == 0 ? rootPath : Path.GetFileName(rootPath));
@@ -134,7 +146,7 @@ namespace Yet_Another_Better_Search
             MinimalDirectoryInfo rootInfo = new MinimalDirectoryInfo(rootPath);
             rootNode.Tag = rootInfo;
 
-            IEnumerable<string> folderContents = null;
+            IEnumerable<string> folderContents;
 
             try
             {
@@ -151,12 +163,11 @@ namespace Yet_Another_Better_Search
             }
 
             List<Task<TreeNode>> createNodeTasks = new List<Task<TreeNode>>();
-
             foreach (string content in folderContents)
             {
                 if (Directory.Exists(content))
                 {
-                    if (depth < searchDepthValue.Value || unlimitedDepthCheck.Checked)
+                    if (unlimitedDepthCheck.Checked || depth < searchDepthValue.Value)
                     {
                         createNodeTasks.Add(createNodeFor(content, depth + 1));
                     }
@@ -190,7 +201,7 @@ namespace Yet_Another_Better_Search
                 }
             }
 
-            foreach(Task<TreeNode> createNodeTask in createNodeTasks)
+            foreach (Task<TreeNode> createNodeTask in createNodeTasks)
             {
                 rootNode.Nodes.Add(await createNodeTask);
             }
@@ -198,7 +209,7 @@ namespace Yet_Another_Better_Search
             return rootNode;
         }
 
-        private string parseFileSize(long absSize)
+        public static string parseFileSize(long absSize)
         {
             if (absSize == 0)
             {
@@ -212,12 +223,14 @@ namespace Yet_Another_Better_Search
             return reducedSize.ToString("F2") + suffixes[sizeOrder];
         }
 
-        private string getNodeFilePath(TreeNode node)
+        public static string getNodeFilePath(TreeNode node)
         {
             return node.FullPath.Replace(new string(Path.DirectorySeparatorChar, 2),
                 Path.DirectorySeparatorChar.ToString());
         }
-        
+
+        NodeToolTip toolTip = new NodeToolTip();
+
         const string notBrowsedText = "This folder was not searched, right click to browse deeper";
         const string noAccessText = "This folder was not searched because it could not be accessed";
         const string browseWarningText = "Please select a folder before browsing";

@@ -98,10 +98,10 @@
             this.resultTree.Location = new System.Drawing.Point(12, 70);
             this.resultTree.Name = "resultTree";
             this.resultTree.SelectedImageIndex = 0;
-            this.resultTree.ShowNodeToolTips = true;
             this.resultTree.Size = new System.Drawing.Size(571, 398);
             this.resultTree.TabIndex = 3;
             this.resultTree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.resultTree_OnMouseClick);
+            this.resultTree.MouseMove += new System.Windows.Forms.MouseEventHandler(this.resultTree_OnMouseMove);
             // 
             // resultTreeImageList
             // 
@@ -124,6 +124,8 @@
             // 
             this.unlimitedDepthCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.unlimitedDepthCheck.AutoSize = true;
+            this.unlimitedDepthCheck.Checked = true;
+            this.unlimitedDepthCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.unlimitedDepthCheck.Location = new System.Drawing.Point(514, 50);
             this.unlimitedDepthCheck.Name = "unlimitedDepthCheck";
             this.unlimitedDepthCheck.Size = new System.Drawing.Size(69, 17);
@@ -135,13 +137,14 @@
             // searchDepthValue
             // 
             this.searchDepthValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.searchDepthValue.Enabled = false;
             this.searchDepthValue.Location = new System.Drawing.Point(468, 48);
             this.searchDepthValue.Name = "searchDepthValue";
             this.searchDepthValue.Size = new System.Drawing.Size(40, 20);
             this.searchDepthValue.TabIndex = 6;
             this.searchDepthValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.searchDepthValue.Value = new decimal(new int[] {
-            20,
+            1,
             0,
             0,
             0});
