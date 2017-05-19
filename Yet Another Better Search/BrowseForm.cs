@@ -36,34 +36,46 @@ namespace Yet_Another_Better_Search
 
         private async void browseBtn_OnClick(object sender, EventArgs e)
         {
-            if (!Directory.Exists(rootPathText.Text))
+            if (!browsing)
             {
-                string defaultText = rootPathText.Text;
-                rootPathText.Text = browseWarningText;
-
-                Color defaultColor = rootPathText.BackColor;
-                rootPathText.BackColor = Color.Yellow;
-                await Task.Delay(400);
-                rootPathText.BackColor = defaultColor;
-                await Task.Delay(400);
-                rootPathText.BackColor = Color.Yellow;
-                await Task.Delay(750);
-
-                rootPathText.BackColor = defaultColor;
-                if (rootPathText.Text == browseWarningText)
+                if (!Directory.Exists(rootPathText.Text))
                 {
-                    rootPathText.Text = defaultText;
+                    string defaultText = rootPathText.Text;
+                    rootPathText.Text = browseWarningText;
+
+                    Color defaultColor = rootPathText.BackColor;
+                    rootPathText.BackColor = Color.Yellow;
+                    await Task.Delay(400);
+                    rootPathText.BackColor = defaultColor;
+                    await Task.Delay(400);
+                    rootPathText.BackColor = Color.Yellow;
+                    await Task.Delay(750);
+
+                    rootPathText.BackColor = defaultColor;
+                    if (rootPathText.Text == browseWarningText)
+                    {
+                        rootPathText.Text = defaultText;
+                    }
+
+                    return;
                 }
 
-                return;
+                browsing = true;
+                browseBtn.Text = "Stop";
+                resultTree.Nodes.Clear();
+
+                TreeNode resultNode = await Task.Run(() =>
+                    createNodeFor(rootPathText.Text, 0)
+                );
+
+                browsing = false;
+                resultTree.Nodes.Add(resultNode);
+                browseBtn.Text = "Browse";
             }
-
-            browseBtn.Enabled = false;
-
-            resultTree.Nodes.Clear();
-            resultTree.Nodes.Add(await createNodeFor(rootPathText.Text, 0));
-
-            browseBtn.Enabled = true;
+            else
+            {
+                browsing = false;
+            }
         }
 
         private void openLocation_OnClick(object sender, EventArgs e)
@@ -93,7 +105,16 @@ namespace Yet_Another_Better_Search
             if (notBrowsedContextMenu.Tag != null)
             {
                 TreeNode targetNode = (TreeNode)notBrowsedContextMenu.Tag;
-                TreeNodeCollection subNodes = (await createNodeFor(getNodeFilePath(targetNode), 0)).Nodes;
+
+                browsing = true;
+                browseBtn.Text = "Stop";
+
+                TreeNodeCollection subNodes = await Task.Run(() =>
+                    createNodeFor(getNodeFilePath(targetNode), 0).Nodes
+                );
+
+                browsing = false;
+                browseBtn.Text = "Browse";
 
                 targetNode.Nodes.Clear();
                 foreach (TreeNode subNode in subNodes)
@@ -137,7 +158,7 @@ namespace Yet_Another_Better_Search
             }
         }
 
-        private async Task<TreeNode> createNodeFor(string rootPath, int depth)
+        private TreeNode createNodeFor(string rootPath, int depth)
         {
             TreeNode rootNode = new TreeNode(depth == 0 ? rootPath : Path.GetFileName(rootPath));
             rootNode.ImageIndex = resultTreeImageList.Images.Count;
@@ -145,6 +166,12 @@ namespace Yet_Another_Better_Search
 
             MinimalDirectoryInfo rootInfo = new MinimalDirectoryInfo(rootPath);
             rootNode.Tag = rootInfo;
+
+            if (!browsing)
+            {
+                rootNode.Nodes.Add(createNotSearchedNode());
+                return rootNode;
+            }
 
             IEnumerable<string> folderContents;
 
@@ -154,11 +181,7 @@ namespace Yet_Another_Better_Search
             }
             catch
             {
-                TreeNode noAccess = new TreeNode(noAccessText);
-                noAccess.ImageIndex = 1;
-                noAccess.SelectedImageIndex = 1;
-
-                rootNode.Nodes.Add(noAccess);
+                rootNode.Nodes.Add(createNoAccessNode());
                 return rootNode;
             }
 
@@ -169,7 +192,7 @@ namespace Yet_Another_Better_Search
                 {
                     if (unlimitedDepthCheck.Checked || depth < searchDepthValue.Value)
                     {
-                        createNodeTasks.Add(createNodeFor(content, depth + 1));
+                        createNodeTasks.Add(Task.Run(() => createNodeFor(content, depth + 1)));
                     }
                     else
                     {
@@ -180,11 +203,7 @@ namespace Yet_Another_Better_Search
                         MinimalDirectoryInfo folderInfo = new MinimalDirectoryInfo(content);
                         folderNode.Tag = folderInfo;
 
-                        TreeNode notSearched = new TreeNode(notBrowsedText);
-                        notSearched.ImageIndex = 0;
-                        notSearched.SelectedImageIndex = 0;
-
-                        folderNode.Nodes.Add(notSearched);
+                        folderNode.Nodes.Add(createNotSearchedNode());
                         rootNode.Nodes.Add(folderNode);
                     }
                 }
@@ -203,10 +222,29 @@ namespace Yet_Another_Better_Search
 
             foreach (Task<TreeNode> createNodeTask in createNodeTasks)
             {
-                rootNode.Nodes.Add(await createNodeTask);
+                createNodeTask.Wait();
+                rootNode.Nodes.Add(createNodeTask.Result);
             }
 
             return rootNode;
+        }
+
+        private static TreeNode createNotSearchedNode()
+        {
+            TreeNode notSearched = new TreeNode(notBrowsedText);
+            notSearched.ImageIndex = 0;
+            notSearched.SelectedImageIndex = 0;
+
+            return notSearched;
+        }
+
+        private static TreeNode createNoAccessNode()
+        {
+            TreeNode noAccess = new TreeNode(noAccessText);
+            noAccess.ImageIndex = 1;
+            noAccess.SelectedImageIndex = 1;
+
+            return noAccess;
         }
 
         public static string parseFileSize(long absSize)
@@ -230,6 +268,8 @@ namespace Yet_Another_Better_Search
         }
 
         NodeToolTip toolTip = new NodeToolTip();
+
+        volatile bool browsing = false;
 
         const string notBrowsedText = "This folder was not searched, right click to browse deeper";
         const string noAccessText = "This folder was not searched because it could not be accessed";

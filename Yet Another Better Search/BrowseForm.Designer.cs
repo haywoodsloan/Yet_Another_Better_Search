@@ -78,7 +78,6 @@
             // browseBtn
             // 
             this.browseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseBtn.AutoSize = true;
             this.browseBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.browseBtn.Location = new System.Drawing.Point(531, 23);
             this.browseBtn.Name = "browseBtn";
