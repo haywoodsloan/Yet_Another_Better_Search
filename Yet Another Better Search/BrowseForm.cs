@@ -197,9 +197,12 @@ namespace Yet_Another_Better_Search
                 {
                     List<Task> browseTasks = new List<Task>();
 
-                    foreach (TreeNode node in rootNode.Nodes)
+                    foreach (TreeNode subNode in rootNode.Nodes)
                     {
-                        browseTasks.Add(Task.Run(() => resumeBrowse(node, depth + 1)));
+                        if (subNode.Nodes.Count > 0)
+                        {
+                            browseTasks.Add(Task.Run(() => resumeBrowse(subNode, depth + 1)));
+                        }
                     }
 
                     foreach (Task browseTask in browseTasks)
