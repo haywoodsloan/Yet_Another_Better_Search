@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -62,14 +63,30 @@ namespace Yet_Another_Better_Search
 
                 browsing = true;
                 browseBtn.Text = "Stop";
-                resultTree.Nodes.Clear();
 
-                TreeNode resultNode = await Task.Run(() =>
-                    createNodeFor(rootPathText.Text, 0)
-                );
+                if (resultTree.Nodes.Count > 0 &&
+                    compareFilePaths(resultTree.Nodes[0].FullPath, rootPathText.Text))
+
+                {
+                    resultTree.BeginUpdate();
+
+                    TreeNode rootNode = resultTree.Nodes[0];
+                    await Task.Run(() => resumeBrowse(rootNode, 0));
+
+                    resultTree.EndUpdate();
+                }
+                else
+                {
+                    resultTree.Nodes.Clear();
+
+                    TreeNode resultNode = await Task.Run(() =>
+                        createNodeFor(getFilePath(rootPathText.Text), 0)
+                    );
+
+                    resultTree.Nodes.Add(resultNode);
+                }
 
                 browsing = false;
-                resultTree.Nodes.Add(resultNode);
                 browseBtn.Text = "Browse";
             }
             else
@@ -154,6 +171,41 @@ namespace Yet_Another_Better_Search
                     nodeContextMenu.Show(resultTree.PointToScreen(e.Location));
 
                     NodeToolTip toolTip = new NodeToolTip();
+                }
+            }
+        }
+
+        private void resumeBrowse(TreeNode rootNode, int depth)
+        {
+            if (rootNode.Nodes.Count == 1 &&
+                rootNode.Nodes[0].Text == notBrowsedText)
+            {
+                TreeNodeCollection subNodes = createNodeFor(getNodeFilePath(rootNode), depth).Nodes;
+
+                resultTree.BeginInvoke(new Action(() =>
+                {
+                    rootNode.Nodes.Clear();
+                    foreach (TreeNode subNode in subNodes)
+                    {
+                        rootNode.Nodes.Add(subNode);
+                    }
+                }));
+            }
+            else if (rootNode.Nodes.Count > 0)
+            {
+                if (unlimitedDepthCheck.Checked || depth < searchDepthValue.Value)
+                {
+                    List<Task> browseTasks = new List<Task>();
+
+                    foreach (TreeNode node in rootNode.Nodes)
+                    {
+                        browseTasks.Add(Task.Run(() => resumeBrowse(node, depth + 1)));
+                    }
+
+                    foreach (Task browseTask in browseTasks)
+                    {
+                        browseTask.Wait();
+                    }
                 }
             }
         }
@@ -261,10 +313,20 @@ namespace Yet_Another_Better_Search
             return reducedSize.ToString("F2") + suffixes[sizeOrder];
         }
 
+        public static bool compareFilePaths(string path1, string path2)
+        {
+            return getFilePath(path1).Equals(getFilePath(path2), StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public static string getNodeFilePath(TreeNode node)
         {
-            return node.FullPath.Replace(new string(Path.DirectorySeparatorChar, 2),
-                Path.DirectorySeparatorChar.ToString());
+            return getFilePath(node.FullPath);
+        }
+
+        public static string getFilePath(string path)
+        {
+            string matchPatern = $@"\{Path.DirectorySeparatorChar}\{Path.DirectorySeparatorChar}+";
+            return Regex.Replace(path.Trim(), matchPatern, Path.DirectorySeparatorChar.ToString());
         }
 
         NodeToolTip toolTip = new NodeToolTip();
