@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,6 +11,18 @@ namespace Yet_Another_Better_Search
 {
     public partial class BrowseForm : Form
     {
+        struct ResumeInfo
+        {
+            public ResumeInfo(TreeNode node, int depth)
+            {
+                Node = node;
+                Depth = depth;
+            }
+
+            public TreeNode Node { get; set; }
+            public int Depth { get; set; }
+        }
+
         public BrowseForm()
         {
             InitializeComponent();
@@ -68,12 +76,15 @@ namespace Yet_Another_Better_Search
                     compareFilePaths(resultTree.Nodes[0].FullPath, rootPathText.Text))
 
                 {
-                    resultTree.BeginUpdate();
-
                     TreeNode rootNode = resultTree.Nodes[0];
-                    await Task.Run(() => resumeBrowse(rootNode, 0));
+                    List<ResumeInfo> infos = listResumeNodes(rootNode, 0);
 
-                    resultTree.EndUpdate();
+                    if (infos.Count > 0)
+                    {
+                        resultTree.BeginUpdate();
+                        await Task.Run(() => resumeBrowse(infos));
+                        resultTree.EndUpdate();
+                    }
                 }
                 else
                 {
@@ -88,6 +99,7 @@ namespace Yet_Another_Better_Search
 
                 browsing = false;
                 browseBtn.Text = "Browse";
+                GC.Collect();
             }
             else
             {
@@ -175,41 +187,59 @@ namespace Yet_Another_Better_Search
             }
         }
 
-        private void resumeBrowse(TreeNode rootNode, int depth)
+        private List<ResumeInfo> listResumeNodes(TreeNode rootNode, int depth)
         {
+            List<ResumeInfo> nodeList = new List<ResumeInfo>();
+
             if (rootNode.Nodes.Count == 1 &&
                 rootNode.Nodes[0].Text == notBrowsedText)
             {
-                TreeNodeCollection subNodes = createNodeFor(getNodeFilePath(rootNode), depth).Nodes;
-
-                resultTree.BeginInvoke(new Action(() =>
-                {
-                    rootNode.Nodes.Clear();
-                    foreach (TreeNode subNode in subNodes)
-                    {
-                        rootNode.Nodes.Add(subNode);
-                    }
-                }));
+                ResumeInfo info = new ResumeInfo(rootNode, depth);
+                nodeList.Add(info);
             }
             else if (rootNode.Nodes.Count > 0)
             {
                 if (unlimitedDepthCheck.Checked || depth < searchDepthValue.Value)
                 {
-                    List<Task> browseTasks = new List<Task>();
-
                     foreach (TreeNode subNode in rootNode.Nodes)
                     {
                         if (subNode.Nodes.Count > 0)
                         {
-                            browseTasks.Add(Task.Run(() => resumeBrowse(subNode, depth + 1)));
+                            nodeList.AddRange(listResumeNodes(subNode, depth + 1));
                         }
                     }
-
-                    foreach (Task browseTask in browseTasks)
-                    {
-                        browseTask.Wait();
-                    }
                 }
+            }
+
+            return nodeList;
+        }
+
+        private void resumeBrowse(List<ResumeInfo> infos)
+        {
+            Task[] resumeTasks = new Task[infos.Count];
+            for (int i = 0; i < infos.Count; i++)
+            {
+                ResumeInfo info = infos[i];
+                resumeTasks[i] = Task.Run(() =>
+                {
+                    TreeNodeCollection subNodes = createNodeFor(
+                        getNodeFilePath(info.Node),
+                        info.Depth).Nodes;
+
+                    BeginInvoke(new Action(() =>
+                    {
+                        info.Node.Nodes.Clear();
+                        foreach (TreeNode subNode in subNodes)
+                        {
+                            info.Node.Nodes.Add(subNode);
+                        }
+                    }));
+                });
+            }
+
+            foreach (Task resumeTask in resumeTasks)
+            {
+                resumeTask.Wait();
             }
         }
 
