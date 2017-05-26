@@ -99,10 +99,13 @@ namespace Yet_Another_Better_Search
 
                 browsing = false;
                 browseBtn.Text = "Browse";
+                browseBtn.Enabled = true;
+
                 GC.Collect();
             }
             else
             {
+                browseBtn.Enabled = false;
                 browsing = false;
             }
         }
@@ -273,9 +276,17 @@ namespace Yet_Another_Better_Search
             List<Task<TreeNode>> createNodeTasks = new List<Task<TreeNode>>();
             foreach (string content in folderContents)
             {
+                if(!browsing)
+                {
+                    rootNode.Nodes.Clear();
+                    rootNode.Nodes.Add(createNotSearchedNode());
+
+                    return rootNode;
+                }
+
                 if (Directory.Exists(content))
                 {
-                    if (unlimitedDepthCheck.Checked || depth < searchDepthValue.Value)
+                    if ((unlimitedDepthCheck.Checked || depth < searchDepthValue.Value) && browsing)
                     {
                         createNodeTasks.Add(Task.Run(() => createNodeFor(content, depth + 1)));
                     }
