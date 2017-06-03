@@ -51,6 +51,7 @@
     <Compile Include="BrowseForm.Designer.cs">
       <DependentUpon>BrowseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MinimalDirectoryInfo.cs" />
     <Compile Include="MinimalFileInfo.cs" />
     <Compile Include="MinimalFileSystemInfo.cs" />

@@ -93,8 +93,8 @@ namespace Yet_Another_Better_Search
                     TreeNode resultNode = await Task.Run(() =>
                         createNodeFor(getFilePath(rootPathText.Text), 0)
                     );
-
-                    resultTree.Nodes.Add(resultNode);
+                    
+                    resultTree.Nodes.AddNodeSorted(resultNode);
                 }
 
                 browsing = false;
@@ -147,12 +147,15 @@ namespace Yet_Another_Better_Search
 
                 browsing = false;
                 browseBtn.Text = "Browse";
+                browseBtn.Enabled = true;
 
                 targetNode.Nodes.Clear();
                 foreach (TreeNode subNode in subNodes)
                 {
-                    targetNode.Nodes.Add(subNode);
+                    targetNode.Nodes.AddNodeSorted(subNode);
                 }
+                
+                GC.Collect();
             }
         }
 
@@ -257,7 +260,7 @@ namespace Yet_Another_Better_Search
 
             if (!browsing)
             {
-                rootNode.Nodes.Add(createNotSearchedNode());
+                rootNode.Nodes.AddNodeSorted(createNotSearchedNode());
                 return rootNode;
             }
 
@@ -269,7 +272,7 @@ namespace Yet_Another_Better_Search
             }
             catch
             {
-                rootNode.Nodes.Add(createNoAccessNode());
+                rootNode.Nodes.AddNodeSorted(createNoAccessNode());
                 return rootNode;
             }
 
@@ -279,7 +282,7 @@ namespace Yet_Another_Better_Search
                 if(!browsing)
                 {
                     rootNode.Nodes.Clear();
-                    rootNode.Nodes.Add(createNotSearchedNode());
+                    rootNode.Nodes.AddNodeSorted(createNotSearchedNode());
 
                     return rootNode;
                 }
@@ -299,8 +302,8 @@ namespace Yet_Another_Better_Search
                         MinimalDirectoryInfo folderInfo = new MinimalDirectoryInfo(content);
                         folderNode.Tag = folderInfo;
 
-                        folderNode.Nodes.Add(createNotSearchedNode());
-                        rootNode.Nodes.Add(folderNode);
+                        folderNode.Nodes.AddNodeSorted(createNotSearchedNode());
+                        rootNode.Nodes.AddNodeSorted(folderNode);
                     }
                 }
                 else
@@ -312,14 +315,14 @@ namespace Yet_Another_Better_Search
                     MinimalFileInfo fileInfo = new MinimalFileInfo(content);
                     fileNode.Tag = fileInfo;
 
-                    rootNode.Nodes.Add(fileNode);
+                    rootNode.Nodes.AddNodeSorted(fileNode);
                 }
             }
 
             foreach (Task<TreeNode> createNodeTask in createNodeTasks)
             {
                 createNodeTask.Wait();
-                rootNode.Nodes.Add(createNodeTask.Result);
+                rootNode.Nodes.AddNodeSorted(createNodeTask.Result);
             }
 
             return rootNode;
