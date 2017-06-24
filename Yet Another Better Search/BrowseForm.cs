@@ -171,7 +171,7 @@ namespace Yet_Another_Better_Search
             }
             else
             {
-                toolTip.ShowToolTip(hitTest.Node);
+                toolTip.ShowToolTip(hitTest.Node, e.Location);
             }
         }
         

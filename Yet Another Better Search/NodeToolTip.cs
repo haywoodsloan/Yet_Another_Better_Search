@@ -16,7 +16,7 @@ namespace Yet_Another_Better_Search
             DisplayedNode = null;
         }
 
-        public void ShowToolTip(TreeNode targetNode)
+        public void ShowToolTip(TreeNode targetNode, Point tipLocation)
         {
             if (targetNode == null)
             {
@@ -43,12 +43,9 @@ namespace Yet_Another_Better_Search
                         $"\nModified: {fileInfo.LastWriteTime.ToString()}" +
                         $"\nSize: {BrowseForm.parseFileSize(fileInfo.Length)}";
                 }
-
-                Point showLocation = Point.Empty;
-                showLocation = tipControl.PointToClient(Cursor.Position);
-                showLocation.Offset(10, 20);
-
-                toolTip.Show(tipText, tipControl, showLocation);
+                                
+                tipLocation.Offset(10, 20);
+                toolTip.Show(tipText, tipControl, tipLocation);
             }
         }
         
