@@ -6,11 +6,11 @@ namespace Yet_Another_Better_Search
     {
         public static void AddNodeSorted(this TreeNodeCollection nodes, TreeNode node)
         {
-            for(int i = 0; i < nodes.Count; i++)
+            for(int i = nodes.Count - 1; i >= 0; i--)
             {
-                if(string.Compare(node.Text, nodes[i].Text) < 0)
+                if(string.Compare(node.Text, nodes[i].Text) > 0)
                 {
-                    nodes.Insert(i, node);
+                    nodes.Insert(i + 1, node);
                     return;
                 }
             }
