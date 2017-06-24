@@ -165,8 +165,17 @@ namespace Yet_Another_Better_Search
 
             if (mouseNode == null)
             {
-                toolTip.Hide();
+                toolTip.ResetToolTipTimer();
             }
+            else
+            {
+                toolTip.BeginToolTipTimer(mouseNode);
+            }
+        }
+        
+        private void resultTree_OnMouseLeave(object sender, EventArgs e)
+        {
+            toolTip.ResetToolTipTimer();
         }
 
         private void resultTree_OnMouseClick(object sender, TreeNodeMouseClickEventArgs e)

@@ -100,6 +100,7 @@
             this.resultTree.Size = new System.Drawing.Size(571, 398);
             this.resultTree.TabIndex = 3;
             this.resultTree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.resultTree_OnMouseClick);
+            this.resultTree.MouseLeave += new System.EventHandler(this.resultTree_OnMouseLeave);
             this.resultTree.MouseMove += new System.Windows.Forms.MouseEventHandler(this.resultTree_OnMouseMove);
             // 
             // resultTreeImageList
