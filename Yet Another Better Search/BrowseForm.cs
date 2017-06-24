@@ -26,6 +26,7 @@ namespace Yet_Another_Better_Search
         public BrowseForm()
         {
             InitializeComponent();
+            toolTip = new NodeToolTip(resultTree);
         }
 
         private void unlimitedDepthCheck_OnCheck(object sender, EventArgs e)
@@ -93,7 +94,7 @@ namespace Yet_Another_Better_Search
                     TreeNode resultNode = await Task.Run(() =>
                         createNodeFor(getFilePath(rootPathText.Text), 0)
                     );
-                    
+
                     resultTree.Nodes.AddNodeSorted(resultNode);
                 }
 
@@ -154,28 +155,29 @@ namespace Yet_Another_Better_Search
                 {
                     targetNode.Nodes.AddNodeSorted(subNode);
                 }
-                
+
                 GC.Collect();
             }
         }
 
         private void resultTree_OnMouseMove(object sender, MouseEventArgs e)
         {
-            TreeNode mouseNode = resultTree.GetNodeAt(e.Location);
+            TreeViewHitTestInfo hitTest = resultTree.HitTest(e.Location);
 
-            if (mouseNode == null)
+            if (hitTest.Location != TreeViewHitTestLocations.Label ||
+                hitTest.Node == null)
             {
-                toolTip.ResetToolTipTimer();
+                toolTip.HideToolTip();
             }
             else
             {
-                toolTip.BeginToolTipTimer(mouseNode);
+                toolTip.ShowToolTip(hitTest.Node);
             }
         }
         
         private void resultTree_OnMouseLeave(object sender, EventArgs e)
         {
-            toolTip.ResetToolTipTimer();
+            toolTip.HideToolTip();
         }
 
         private void resultTree_OnMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -196,8 +198,6 @@ namespace Yet_Another_Better_Search
                 {
                     nodeContextMenu.Tag = e.Node;
                     nodeContextMenu.Show(resultTree.PointToScreen(e.Location));
-
-                    NodeToolTip toolTip = new NodeToolTip();
                 }
             }
         }
@@ -385,12 +385,12 @@ namespace Yet_Another_Better_Search
             return Regex.Replace(path.Trim(), matchPatern, Path.DirectorySeparatorChar.ToString());
         }
 
-        NodeToolTip toolTip = new NodeToolTip();
+        private NodeToolTip toolTip;
 
-        volatile bool browsing = false;
+        private volatile bool browsing = false;
 
-        const string notBrowsedText = "This folder was not searched, right click to browse deeper";
-        const string noAccessText = "This folder was not searched because it could not be accessed";
-        const string browseWarningText = "Please select a folder before browsing";
+        public const string notBrowsedText = "This folder was not searched, right click to browse deeper";
+        public const string noAccessText = "This folder was not searched because it could not be accessed";
+        public const string browseWarningText = "Please select a folder before browsing";
     }
 }

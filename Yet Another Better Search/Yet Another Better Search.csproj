@@ -55,20 +55,12 @@
     <Compile Include="MinimalDirectoryInfo.cs" />
     <Compile Include="MinimalFileInfo.cs" />
     <Compile Include="MinimalFileSystemInfo.cs" />
-    <Compile Include="NodeToolTip.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NodeToolTip.Designer.cs">
-      <DependentUpon>NodeToolTip.cs</DependentUpon>
-    </Compile>
+    <Compile Include="NodeToolTip.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unmanaged.cs" />
     <EmbeddedResource Include="BrowseForm.resx">
       <DependentUpon>BrowseForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NodeToolTip.resx">
-      <DependentUpon>NodeToolTip.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

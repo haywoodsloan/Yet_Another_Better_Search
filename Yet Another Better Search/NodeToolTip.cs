@@ -1,95 +1,60 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using System.Drawing;
-using System.Timers;
 
 namespace Yet_Another_Better_Search
 {
-    public partial class NodeToolTip : Form
+    public class NodeToolTip
     {
-        public NodeToolTip()
+        public NodeToolTip(Control _tipControl)
         {
-            InitializeComponent();
+            tipControl = _tipControl;
+        }      
 
-            toolTipTimer.AutoReset = false;
-            toolTipTimer.Elapsed += toolTipTimer_Elapsed;
-
-            CreateHandle();
-        }
-        
-        public void ResetToolTipTimer()
+        public void HideToolTip()
         {
-            if (Visible)
-            {
-                BeginInvoke(new Action(() => Hide()));
-            }
-
-            toolTipTimer.Stop();
+            toolTip.Hide(tipControl);
             DisplayedNode = null;
         }
 
-        public void BeginToolTipTimer(TreeNode targetNode)
+        public void ShowToolTip(TreeNode targetNode)
         {
-            if(targetNode == null)
+            if (targetNode == null)
             {
-                ResetToolTipTimer();
+                toolTip.Hide(tipControl);
+                DisplayedNode = null;
             }
             else if (DisplayedNode != targetNode)
             {
-                if (Visible)
-                {
-                    BeginInvoke(new Action(() => Hide()));
-                }
-
                 DisplayedNode = targetNode;
-                toolTipTimer.Start();
-            }
-        }
-        
-        private void toolTipTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-           showToolTip();
-        }
 
-        private delegate void showToolTipDelegate();
-        private void showToolTip()
-        {
-            if(InvokeRequired)
-            {
-                showToolTipDelegate callback = new showToolTipDelegate(showToolTip);
-                BeginInvoke(callback);
-            }
-            else
-            {
+                string tipText;
                 if (DisplayedNode.Tag.GetType() == typeof(MinimalDirectoryInfo))
                 {
                     MinimalDirectoryInfo dirInfo = (MinimalDirectoryInfo)DisplayedNode.Tag;
-                    toolTipText.Text = $"{BrowseForm.getNodeFilePath(DisplayedNode)}" +
+                    tipText = $"{BrowseForm.getNodeFilePath(DisplayedNode)}" +
                         $"\nCreated: {dirInfo.CreationTime.ToString()}" +
                         $"\nModified: {dirInfo.LastWriteTime.ToString()}";
                 }
                 else
                 {
                     MinimalFileInfo fileInfo = (MinimalFileInfo)DisplayedNode.Tag;
-                    toolTipText.Text = $"{BrowseForm.getNodeFilePath(DisplayedNode)}" +
+                    tipText = $"{BrowseForm.getNodeFilePath(DisplayedNode)}" +
                         $"\nCreated: {fileInfo.CreationTime.ToString()}" +
                         $"\nModified: {fileInfo.LastWriteTime.ToString()}" +
                         $"\nSize: {BrowseForm.parseFileSize(fileInfo.Length)}";
                 }
 
-                Size = toolTipText.Size;
+                Point showLocation = Point.Empty;
+                showLocation = tipControl.PointToClient(Cursor.Position);
+                showLocation.Offset(10, 20);
 
-                Point showLocation = Cursor.Position;
-                showLocation.Offset(15, 15);
-                Location = showLocation;
-
-                Show();
-                BringToFront();
+                toolTip.Show(tipText, tipControl, showLocation);
             }
         }
-
+        
         public TreeNode DisplayedNode { get; private set; }
 
-        private System.Timers.Timer toolTipTimer = new System.Timers.Timer(500);
+        private ToolTip toolTip = new ToolTip();
+        private Control tipControl;
     }
 }
