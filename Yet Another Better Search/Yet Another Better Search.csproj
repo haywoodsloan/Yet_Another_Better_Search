@@ -51,7 +51,7 @@
     <Compile Include="BrowseForm.Designer.cs">
       <DependentUpon>BrowseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="EnumExtension.cs" />
+    <Compile Include="EnumEx.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FileSizeParser.cs" />
     <Compile Include="MinimalDirectoryInfo.cs" />

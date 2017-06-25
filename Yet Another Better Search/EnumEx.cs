@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Yet_Another_Better_Search
 {
-    public static class EnumExtension
+    public static class EnumEx
     {
         public static string[] GetDescriptions(Type enumType)
         {
@@ -34,6 +34,24 @@ namespace Yet_Another_Better_Search
             }
 
             return descriptions;
+        }
+
+        public static object GetDescription(Type enumType, object value)
+        {
+            if (!enumType.IsEnum) throw new ArgumentException();
+
+            FieldInfo enumField = enumType.GetField(value.ToString());
+            DescriptionAttribute[] enumAttributes = (DescriptionAttribute[])
+                   enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+            if (enumAttributes.Length > 0)
+            {
+                return enumAttributes[0].Description;
+            }
+            else
+            {
+                return enumField.Name;
+            }
         }
 
         public static object GetValueFromDescription(Type enumType, string description)

@@ -219,9 +219,9 @@
             this.filterBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.filterBtn.Location = new System.Drawing.Point(0, 0);
-            this.filterBtn.Margin = new System.Windows.Forms.Padding(0);
+            this.filterBtn.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this.filterBtn.Name = "filterBtn";
-            this.filterBtn.Size = new System.Drawing.Size(285, 23);
+            this.filterBtn.Size = new System.Drawing.Size(282, 23);
             this.filterBtn.TabIndex = 9;
             this.filterBtn.Text = "Filter";
             this.filterBtn.UseVisualStyleBackColor = true;
@@ -231,10 +231,10 @@
             // 
             this.searchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.searchBtn.Location = new System.Drawing.Point(285, 0);
-            this.searchBtn.Margin = new System.Windows.Forms.Padding(0);
+            this.searchBtn.Location = new System.Drawing.Point(288, 0);
+            this.searchBtn.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.searchBtn.Name = "searchBtn";
-            this.searchBtn.Size = new System.Drawing.Size(286, 23);
+            this.searchBtn.Size = new System.Drawing.Size(283, 23);
             this.searchBtn.TabIndex = 10;
             this.searchBtn.Text = "Search";
             this.searchBtn.UseVisualStyleBackColor = true;
@@ -246,6 +246,7 @@
             this.filterSearchButtonLayout.ColumnCount = 2;
             this.filterSearchButtonLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.filterSearchButtonLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.filterSearchButtonLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.filterSearchButtonLayout.Controls.Add(this.filterBtn, 0, 0);
             this.filterSearchButtonLayout.Controls.Add(this.searchBtn, 1, 0);
             this.filterSearchButtonLayout.Location = new System.Drawing.Point(12, 458);
@@ -253,7 +254,6 @@
             this.filterSearchButtonLayout.Name = "filterSearchButtonLayout";
             this.filterSearchButtonLayout.RowCount = 1;
             this.filterSearchButtonLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.filterSearchButtonLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.filterSearchButtonLayout.Size = new System.Drawing.Size(571, 23);
             this.filterSearchButtonLayout.TabIndex = 11;
             // 
