@@ -41,7 +41,7 @@ namespace Yet_Another_Better_Search
                     tipText = $"{BrowseForm.getNodeFilePath(DisplayedNode)}" +
                         $"\nCreated: {fileInfo.CreationTime.ToString()}" +
                         $"\nModified: {fileInfo.LastWriteTime.ToString()}" +
-                        $"\nSize: {BrowseForm.parseFileSize(fileInfo.Length)}";
+                        $"\nSize: {FileSizeParser.ToString(fileInfo.Length)}";
                 }
                                 
                 tipLocation.Offset(10, 20);

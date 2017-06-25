@@ -51,13 +51,21 @@
     <Compile Include="BrowseForm.Designer.cs">
       <DependentUpon>BrowseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="EnumExtension.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FileSizeParser.cs" />
     <Compile Include="MinimalDirectoryInfo.cs" />
     <Compile Include="MinimalFileInfo.cs" />
     <Compile Include="MinimalFileSystemInfo.cs" />
     <Compile Include="NodeToolTip.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchCriteriaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SearchCriteriaForm.Designer.cs">
+      <DependentUpon>SearchCriteriaForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Unmanaged.cs" />
     <EmbeddedResource Include="BrowseForm.resx">
       <DependentUpon>BrowseForm.cs</DependentUpon>
@@ -71,6 +79,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SearchCriteriaForm.resx">
+      <DependentUpon>SearchCriteriaForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -159,6 +159,12 @@ namespace Yet_Another_Better_Search
                 GC.Collect();
             }
         }
+        
+        private void filterBtn_OnClick(object sender, EventArgs e)
+        {
+            SearchCriteriaForm criteraForm = new SearchCriteriaForm(false);
+            criteraForm.ShowDialog(this);
+        }
 
         private void resultTree_OnMouseMove(object sender, MouseEventArgs e)
         {
@@ -354,21 +360,7 @@ namespace Yet_Another_Better_Search
 
             return noAccess;
         }
-
-        public static string parseFileSize(long absSize)
-        {
-            if (absSize == 0)
-            {
-                return "0 Bytes";
-            }
-
-            string[] suffixes = { "Bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
-            int sizeOrder = (int)Math.Log(absSize, 1024);
-
-            double reducedSize = absSize / Math.Pow(1024, sizeOrder);
-            return reducedSize.ToString("F2") + suffixes[sizeOrder];
-        }
-
+        
         public static bool compareFilePaths(string path1, string path2)
         {
             return getFilePath(path1).Equals(getFilePath(path2), StringComparison.InvariantCultureIgnoreCase);
