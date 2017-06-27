@@ -12,13 +12,16 @@ namespace Yet_Another_Better_Search
 
         public void HideToolTip()
         {
-            toolTip.Hide(tipControl);
-            DisplayedNode = null;
+            if (toolTip.Active)
+            {
+                toolTip.Hide(tipControl);
+                DisplayedNode = null;
+            }
         }
 
         public void ShowToolTip(TreeNode targetNode, Point tipLocation)
         {
-            if (targetNode == null)
+            if (targetNode == null && toolTip.Active)
             {
                 toolTip.Hide(tipControl);
                 DisplayedNode = null;

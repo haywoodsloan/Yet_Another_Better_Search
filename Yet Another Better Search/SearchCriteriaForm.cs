@@ -43,6 +43,29 @@ namespace Yet_Another_Better_Search
         GreaterThan
     }
 
+    public enum NameValidation
+    {
+        Good,
+        BadRegex
+    }
+
+    public enum DateValidation
+    {
+        Good,
+        AfterNow,
+        NegativeSpan
+    }
+
+    public enum SizeValidation
+    {
+        Good,
+        LessThanZero,
+        NegativeSpan,
+        SizeBad,
+        FirstSizeBad,
+        SecondSizeBad
+    }
+
     public struct SearchCriteria
     {
         public SearchType SearchType;
@@ -216,7 +239,7 @@ namespace Yet_Another_Better_Search
             SearchType searchType = (SearchType)EnumEx.GetValueFromDescription(typeof(SearchType),
                 searchTypeCombo.SelectedItem.ToString());
 
-            if((searchType == SearchType.Folders || searchType == SearchType.Both) &&
+            if ((searchType == SearchType.Folders || searchType == SearchType.Both) &&
                 sizeCriteria != SizeCriteria.Any)
             {
                 folderSizeLabel.Visible = true;
@@ -253,84 +276,206 @@ namespace Yet_Another_Better_Search
             }
         }
 
-        private bool validateNameCriteria()
+        private void okayBtn_OnClick(object sender, EventArgs e)
+        {
+            NameValidation nameResult = validateNameCriteria();
+            switch (nameResult)
+            {
+                case NameValidation.BadRegex:
+                    warningLabel.Text = "Warning: A bad regular expression was provided for the name criteria";
+                    warningLabel.Visible = true;
+                    return;
+            }
+
+            DateValidation modifiedResult = validateModifiedCriteria();
+            switch (modifiedResult)
+            {
+                case DateValidation.AfterNow:
+                    warningLabel.Text = "Warning: The modified date criteria is in the future";
+                    warningLabel.Visible = true;
+                    return;
+                case DateValidation.NegativeSpan:
+                    warningLabel.Text = "Warning: The modified date criteria has inverted begin and end dates";
+                    warningLabel.Visible = true;
+                    return;
+            }
+
+            DateValidation creationResult = validateCreationCriteria();
+            switch (creationResult)
+            {
+                case DateValidation.AfterNow:
+                    warningLabel.Text = "Warning: The creation date criteria is in the future";
+                    warningLabel.Visible = true;
+                    return;
+                case DateValidation.NegativeSpan:
+                    warningLabel.Text = "Warning: The creation date criteria has inverted begin and end dates";
+                    warningLabel.Visible = true;
+                    return;
+            }
+
+            SizeValidation sizeResult = validateSizeCriteria();
+            switch (sizeResult)
+            {
+                case SizeValidation.SizeBad:
+                    warningLabel.Text = "Warning: The size criteria is not a valid number";
+                    warningLabel.Visible = true;
+                    return;
+                case SizeValidation.FirstSizeBad:
+                    warningLabel.Text = "Warning: The size criteria minimum is not a valid number";
+                    warningLabel.Visible = true;
+                    return;
+                case SizeValidation.SecondSizeBad:
+                    warningLabel.Text = "Warning: The size criteria maximum is not a valid number";
+                    warningLabel.Visible = true;
+                    return;
+                case SizeValidation.NegativeSpan:
+                    warningLabel.Text = "Warning: The size criteria has inverted miniumum and maximum values";
+                    warningLabel.Visible = true;
+                    return;
+                case SizeValidation.LessThanZero:
+                    warningLabel.Text = "Warning: The size criteria is less than zero";
+                    warningLabel.Visible = true;
+                    return;
+            }
+
+            warningLabel.Visible = false;
+            DialogResult = DialogResult.OK;
+        }
+
+        private NameValidation validateNameCriteria()
         {
             NameCriteria nameCriteria = (NameCriteria)EnumEx.GetValueFromDescription(typeof(NameCriteria),
                 nameCriteriaCombo.SelectedItem.ToString());
 
-            if(nameCriteria == NameCriteria.Match)
+            if (nameCriteria == NameCriteria.Match &&
+                regexCheck.Checked)
             {
-                if(regexCheck.Checked)
+                try
                 {
-                    try
-                    {
-                        new Regex(nameTextBox.Text);
-                    }
-                    catch (ArgumentException)
-                    {
-                        return false;
-                    }
+                    new Regex(nameTextBox.Text);
+                }
+                catch (ArgumentException)
+                {
+                    return NameValidation.BadRegex;
+                }
+            }
 
-                    return true;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return true;
-            }
+            return NameValidation.Good;
         }
 
-        private bool validateModifiedCriteria()
+        private DateValidation validateModifiedCriteria()
         {
             DateCriteria modifiedCriteria = (DateCriteria)EnumEx.GetValueFromDescription(typeof(DateCriteria),
                 modifiedCriteriaCombo.SelectedItem.ToString());
 
-            DateTime firstDateTime = firstModifiedDatePicker.Value;
-            firstDateTime.Subtract(firstDateTime.TimeOfDay);
-            firstDateTime.Add(firstModifiedTimePicker.Value.TimeOfDay);
+            DateTime firstDateTime = firstModifiedDatePicker.Value.Date;
+            firstDateTime = firstDateTime.Add(firstModifiedTimePicker.Value.TimeOfDay);
 
-            DateTime secondDateTime = secondModifiedDatePicker.Value;
-            secondDateTime.Subtract(secondDateTime.TimeOfDay);
-            secondDateTime.Add(secondModifiedTimePicker.Value.TimeOfDay);
+            DateTime secondDateTime = secondModifiedDatePicker.Value.Date;
+            secondDateTime = secondDateTime.Add(secondModifiedTimePicker.Value.TimeOfDay);
 
             return validateDateCriteria(modifiedCriteria, firstDateTime, secondDateTime);
         }
 
-        private bool validateCreationCriteria()
+        private DateValidation validateCreationCriteria()
         {
             DateCriteria creationCriteria = (DateCriteria)EnumEx.GetValueFromDescription(typeof(DateCriteria),
                 creationCriteriaCombo.SelectedItem.ToString());
 
-            DateTime firstDateTime = firstCreationDatePicker.Value;
-            firstDateTime.Subtract(firstDateTime.TimeOfDay);
-            firstDateTime.Add(firstCreationTimePicker.Value.TimeOfDay);
+            DateTime firstDateTime = firstCreationDatePicker.Value.Date;
+            firstDateTime = firstDateTime.Add(firstCreationTimePicker.Value.TimeOfDay);
 
-            DateTime secondDateTime = secondCreationDatePicker.Value;
-            secondDateTime.Subtract(secondDateTime.TimeOfDay);
-            secondDateTime.Add(secondCreationTimePicker.Value.TimeOfDay);
+            DateTime secondDateTime = secondCreationDatePicker.Value.Date;
+            secondDateTime = secondDateTime.Add(secondCreationTimePicker.Value.TimeOfDay);
 
             return validateDateCriteria(creationCriteria, firstDateTime, secondDateTime);
         }
 
-        private bool validateDateCriteria(DateCriteria dateCriteria, 
+        private DateValidation validateDateCriteria(DateCriteria dateCriteria,
             DateTime firstDateTime, DateTime secondDateTime)
         {
             switch (dateCriteria)
             {
                 case DateCriteria.On:
-                    return firstDateTime.Date <= DateTime.Today.Date;
+                    if (firstDateTime.Date > DateTime.Today.Date)
+                        return DateValidation.AfterNow;
+
+                    break;
                 case DateCriteria.After:
-                    return firstDateTime <= DateTime.Now;
+                    if (firstDateTime > DateTime.Now)
+                        return DateValidation.AfterNow;
+
+                    break;
                 case DateCriteria.Between:
-                    return firstDateTime <= DateTime.Now 
-                        && firstDateTime <= secondDateTime;
-                default:
-                    return true;
+                    if (firstDateTime > DateTime.Now)
+                        return DateValidation.AfterNow;
+
+                    if (firstDateTime > secondDateTime)
+                        return DateValidation.NegativeSpan;
+
+                    break;
             }
+
+            return DateValidation.Good;
+        }
+
+        private SizeValidation validateSizeCriteria()
+        {
+            SizeCriteria sizeCriteria = (SizeCriteria)EnumEx.GetValueFromDescription(typeof(SizeCriteria),
+                sizeCriteriaCombo.SelectedItem.ToString());
+
+            double firstSize;
+            double secondSize;
+
+            long firstTotalSize = 0;
+            long secondTotalSize = 0;
+
+            if (sizeCriteria != SizeCriteria.Any)
+            {
+                if (double.TryParse(firstSizeTextBox.Text, out firstSize))
+                {
+                    int firstSizeScale = (int)EnumEx.GetValueFromDescription(typeof(FileSizeScale),
+                        firstSizeScaleCombo.SelectedItem.ToString());
+
+                    firstTotalSize = (long)(firstSize * Math.Pow(1024, firstSizeScale));
+                }
+                else
+                {
+                    return sizeCriteria == SizeCriteria.Between ? 
+                        SizeValidation.FirstSizeBad : SizeValidation.SizeBad;
+                }
+            }
+
+            if (sizeCriteria == SizeCriteria.Between)
+            {
+                if (double.TryParse(secondSizeTextBox.Text, out secondSize))
+                {
+                    int secondSizeScale = (int)EnumEx.GetValueFromDescription(typeof(FileSizeScale),
+                        secondSizeScaleCombo.SelectedItem.ToString());
+
+                    secondTotalSize = (long)(secondSize * Math.Pow(1024, secondSizeScale));
+                }
+                else
+                {
+                    return SizeValidation.SecondSizeBad;
+                }
+            }
+
+            switch (sizeCriteria)
+            {
+                case SizeCriteria.LessThan:
+                    if (firstTotalSize == 0)
+                        return SizeValidation.LessThanZero;
+
+                    break;
+                case SizeCriteria.Between:
+                    if (firstTotalSize > secondTotalSize)
+                        return SizeValidation.NegativeSpan;
+
+                    break;
+            }
+
+            return SizeValidation.Good;
         }
     }
 }

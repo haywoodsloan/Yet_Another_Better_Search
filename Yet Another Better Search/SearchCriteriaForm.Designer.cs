@@ -48,20 +48,20 @@
             this.creationAndLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.sizeCriteriaCombo = new System.Windows.Forms.ComboBox();
-            this.sizeAndLabel = new System.Windows.Forms.Label();
             this.firstSizeTextBox = new System.Windows.Forms.TextBox();
             this.firstSizeScaleCombo = new System.Windows.Forms.ComboBox();
             this.secondSizeScaleCombo = new System.Windows.Forms.ComboBox();
             this.secondSizeTextBox = new System.Windows.Forms.TextBox();
             this.okayBtn = new System.Windows.Forms.Button();
             this.cancelBtn = new System.Windows.Forms.Button();
-            this.label9 = new System.Windows.Forms.Label();
+            this.warningLabel = new System.Windows.Forms.Label();
             this.folderSizeLabel = new System.Windows.Forms.Label();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.firstModifiedTimePicker = new System.Windows.Forms.DateTimePicker();
             this.secondModifiedTimePicker = new System.Windows.Forms.DateTimePicker();
             this.firstCreationTimePicker = new System.Windows.Forms.DateTimePicker();
             this.secondCreationTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.sizeAndLabel = new System.Windows.Forms.Label();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -247,16 +247,6 @@
             this.sizeCriteriaCombo.TabIndex = 1;
             this.sizeCriteriaCombo.SelectionChangeCommitted += new System.EventHandler(this.sizeCriteriaCombo_OnChange);
             // 
-            // sizeAndLabel
-            // 
-            this.sizeAndLabel.AutoSize = true;
-            this.sizeAndLabel.Location = new System.Drawing.Point(276, 123);
-            this.sizeAndLabel.Name = "sizeAndLabel";
-            this.sizeAndLabel.Size = new System.Drawing.Size(25, 13);
-            this.sizeAndLabel.TabIndex = 6;
-            this.sizeAndLabel.Text = "and";
-            this.sizeAndLabel.Visible = false;
-            // 
             // firstSizeTextBox
             // 
             this.firstSizeTextBox.Location = new System.Drawing.Point(99, 0);
@@ -281,7 +271,7 @@
             // 
             this.secondSizeScaleCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.secondSizeScaleCombo.FormattingEnabled = true;
-            this.secondSizeScaleCombo.Location = new System.Drawing.Point(305, 0);
+            this.secondSizeScaleCombo.Location = new System.Drawing.Point(336, 0);
             this.secondSizeScaleCombo.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.secondSizeScaleCombo.Name = "secondSizeScaleCombo";
             this.secondSizeScaleCombo.Size = new System.Drawing.Size(50, 21);
@@ -290,7 +280,7 @@
             // 
             // secondSizeTextBox
             // 
-            this.secondSizeTextBox.Location = new System.Drawing.Point(230, 0);
+            this.secondSizeTextBox.Location = new System.Drawing.Point(261, 0);
             this.secondSizeTextBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.secondSizeTextBox.Name = "secondSizeTextBox";
             this.secondSizeTextBox.Size = new System.Drawing.Size(69, 20);
@@ -305,6 +295,7 @@
             this.okayBtn.TabIndex = 7;
             this.okayBtn.Text = "Okay";
             this.okayBtn.UseVisualStyleBackColor = true;
+            this.okayBtn.Click += new System.EventHandler(this.okayBtn_OnClick);
             // 
             // cancelBtn
             // 
@@ -316,24 +307,24 @@
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             // 
-            // label9
+            // warningLabel
             // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.ForeColor = System.Drawing.Color.Red;
-            this.label9.Location = new System.Drawing.Point(12, 144);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(82, 13);
-            this.label9.TabIndex = 8;
-            this.label9.Text = "(Warning Label)";
-            this.label9.Visible = false;
+            this.warningLabel.AutoSize = true;
+            this.warningLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.warningLabel.ForeColor = System.Drawing.Color.Red;
+            this.warningLabel.Location = new System.Drawing.Point(12, 144);
+            this.warningLabel.Name = "warningLabel";
+            this.warningLabel.Size = new System.Drawing.Size(82, 13);
+            this.warningLabel.TabIndex = 8;
+            this.warningLabel.Text = "(Warning Label)";
+            this.warningLabel.Visible = false;
             // 
             // folderSizeLabel
             // 
             this.folderSizeLabel.AutoSize = true;
             this.folderSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.folderSizeLabel.ForeColor = System.Drawing.Color.Red;
-            this.folderSizeLabel.Location = new System.Drawing.Point(361, 4);
+            this.folderSizeLabel.Location = new System.Drawing.Point(392, 4);
             this.folderSizeLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 0);
             this.folderSizeLabel.Name = "folderSizeLabel";
             this.folderSizeLabel.Size = new System.Drawing.Size(107, 13);
@@ -346,12 +337,13 @@
             this.flowLayoutPanel1.Controls.Add(this.sizeCriteriaCombo);
             this.flowLayoutPanel1.Controls.Add(this.firstSizeTextBox);
             this.flowLayoutPanel1.Controls.Add(this.firstSizeScaleCombo);
+            this.flowLayoutPanel1.Controls.Add(this.sizeAndLabel);
             this.flowLayoutPanel1.Controls.Add(this.secondSizeTextBox);
             this.flowLayoutPanel1.Controls.Add(this.secondSizeScaleCombo);
             this.flowLayoutPanel1.Controls.Add(this.folderSizeLabel);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(49, 120);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(483, 21);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(550, 21);
             this.flowLayoutPanel1.TabIndex = 9;
             // 
             // firstModifiedTimePicker
@@ -398,16 +390,26 @@
             this.secondCreationTimePicker.Value = new System.DateTime(2017, 6, 25, 0, 0, 0, 0);
             this.secondCreationTimePicker.Visible = false;
             // 
+            // sizeAndLabel
+            // 
+            this.sizeAndLabel.AutoSize = true;
+            this.sizeAndLabel.Location = new System.Drawing.Point(230, 4);
+            this.sizeAndLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 0);
+            this.sizeAndLabel.Name = "sizeAndLabel";
+            this.sizeAndLabel.Size = new System.Drawing.Size(25, 13);
+            this.sizeAndLabel.TabIndex = 6;
+            this.sizeAndLabel.Text = "and";
+            this.sizeAndLabel.Visible = false;
+            // 
             // SearchCriteriaForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(611, 190);
             this.Controls.Add(this.flowLayoutPanel1);
-            this.Controls.Add(this.label9);
+            this.Controls.Add(this.warningLabel);
             this.Controls.Add(this.cancelBtn);
             this.Controls.Add(this.okayBtn);
-            this.Controls.Add(this.sizeAndLabel);
             this.Controls.Add(this.creationAndLabel);
             this.Controls.Add(this.modifiedAndLabel);
             this.Controls.Add(this.secondCreationDatePicker);
@@ -463,19 +465,19 @@
         private System.Windows.Forms.Label creationAndLabel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox sizeCriteriaCombo;
-        private System.Windows.Forms.Label sizeAndLabel;
         private System.Windows.Forms.TextBox firstSizeTextBox;
         private System.Windows.Forms.ComboBox firstSizeScaleCombo;
         private System.Windows.Forms.ComboBox secondSizeScaleCombo;
         private System.Windows.Forms.TextBox secondSizeTextBox;
         private System.Windows.Forms.Button okayBtn;
         private System.Windows.Forms.Button cancelBtn;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label warningLabel;
         private System.Windows.Forms.Label folderSizeLabel;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.DateTimePicker firstModifiedTimePicker;
         private System.Windows.Forms.DateTimePicker secondModifiedTimePicker;
         private System.Windows.Forms.DateTimePicker firstCreationTimePicker;
         private System.Windows.Forms.DateTimePicker secondCreationTimePicker;
+        private System.Windows.Forms.Label sizeAndLabel;
     }
 }
