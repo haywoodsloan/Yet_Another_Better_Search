@@ -61,8 +61,8 @@ namespace Yet_Another_Better_Search
         Good,
         LessThanZero,
         NegativeSpan,
-        SizeBad,
-        FirstSizeBad,
+        SizeBad, // Represent a bad size input when only one is available.
+        FirstSizeBad, // Represent a bad size input when both are available.
         SecondSizeBad
     }
 
@@ -360,6 +360,11 @@ namespace Yet_Another_Better_Search
                 }
             }
 
+            searchCriteria.NameCriteria = nameCriteria;
+            searchCriteria.NameText = nameTextBox.Text;
+            searchCriteria.MatchCase = caseCheck.Checked;
+            searchCriteria.UseRegex = regexCheck.Checked;
+
             return NameValidation.Good;
         }
 
@@ -374,7 +379,13 @@ namespace Yet_Another_Better_Search
             DateTime secondDateTime = secondModifiedDatePicker.Value.Date;
             secondDateTime = secondDateTime.Add(secondModifiedTimePicker.Value.TimeOfDay);
 
-            return validateDateCriteria(modifiedCriteria, firstDateTime, secondDateTime);
+            DateValidation modifiedResult = validateDateCriteria(modifiedCriteria, firstDateTime, secondDateTime);
+
+            searchCriteria.ModifiedDateCriteria = modifiedCriteria;
+            searchCriteria.FirstModifiedDate = firstDateTime;
+            searchCriteria.SecondModifiedDate = secondDateTime;
+
+            return modifiedResult;
         }
 
         private DateValidation validateCreationCriteria()
@@ -388,7 +399,13 @@ namespace Yet_Another_Better_Search
             DateTime secondDateTime = secondCreationDatePicker.Value.Date;
             secondDateTime = secondDateTime.Add(secondCreationTimePicker.Value.TimeOfDay);
 
-            return validateDateCriteria(creationCriteria, firstDateTime, secondDateTime);
+            DateValidation creationResult =  validateDateCriteria(creationCriteria, firstDateTime, secondDateTime);
+
+            searchCriteria.CreatedDateCriteria = creationCriteria;
+            searchCriteria.FirstCreatedDate = firstDateTime;
+            searchCriteria.SecondCreatedDate = secondDateTime;
+
+            return creationResult;
         }
 
         private DateValidation validateDateCriteria(DateCriteria dateCriteria,
@@ -475,7 +492,22 @@ namespace Yet_Another_Better_Search
                     break;
             }
 
+            searchCriteria.SizeCriteria = sizeCriteria;
+            searchCriteria.FirstSize = firstTotalSize;
+            searchCriteria.SecondSize = secondTotalSize;
+
             return SizeValidation.Good;
         }
+
+        public SearchCriteria GetSearchCriteria()
+        {
+            SearchType searchType = (SearchType)EnumEx.GetValueFromDescription(typeof(SearchType),
+                searchTypeCombo.SelectedItem.ToString());
+
+            searchCriteria.SearchType = searchType;
+            return searchCriteria;
+        }
+
+        private SearchCriteria searchCriteria;
     }
 }
