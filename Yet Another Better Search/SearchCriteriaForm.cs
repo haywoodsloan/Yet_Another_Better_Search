@@ -112,12 +112,17 @@ namespace Yet_Another_Better_Search
             sizeCriteriaCombo.DataSource = EnumEx.GetDescriptions(typeof(SizeCriteria));
             firstSizeScaleCombo.DataSource = EnumEx.GetDescriptions(typeof(FileSizeScale));
             secondSizeScaleCombo.DataSource = EnumEx.GetDescriptions(typeof(FileSizeScale));
+            
+            SearchType searchType = (SearchType)EnumEx.GetValueFromDescription(typeof(SearchType),
+                searchTypeCombo.SelectedItem.ToString());
+            searchCriteria.SearchType = searchType;
         }
 
         private void searchTypeCombo_OnChange(object sender, EventArgs e)
         {
             SearchType searchType = (SearchType)EnumEx.GetValueFromDescription(typeof(SearchType),
                 searchTypeCombo.SelectedItem.ToString());
+            searchCriteria.SearchType = searchType;
 
             SizeCriteria sizeCriteria = (SizeCriteria)EnumEx.GetValueFromDescription(typeof(SizeCriteria),
                 sizeCriteriaCombo.SelectedItem.ToString());
@@ -501,10 +506,6 @@ namespace Yet_Another_Better_Search
 
         public SearchCriteria GetSearchCriteria()
         {
-            SearchType searchType = (SearchType)EnumEx.GetValueFromDescription(typeof(SearchType),
-                searchTypeCombo.SelectedItem.ToString());
-
-            searchCriteria.SearchType = searchType;
             return searchCriteria;
         }
 
