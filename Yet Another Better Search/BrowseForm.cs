@@ -19,8 +19,8 @@ namespace Yet_Another_Better_Search
                 Depth = depth;
             }
 
-            public TreeNode Node { get; set; }
-            public int Depth { get; set; }
+            public TreeNode Node { get; private set; }
+            public int Depth { get; private set; }
         }
 
         struct FilteredNode
@@ -31,8 +31,8 @@ namespace Yet_Another_Better_Search
                 ParentNode = parentNode;
             }
 
-            public TreeNode Node { get; set; }
-            public TreeNode ParentNode { get; set; }
+            public TreeNode Node { get; private set; }
+            public TreeNode ParentNode { get; private set; }
         }
 
         public BrowseForm()
