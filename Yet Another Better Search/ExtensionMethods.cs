@@ -17,7 +17,7 @@ namespace Yet_Another_Better_Search
                 }
             }
 
-            nodes.Add(node);
+            nodes.Insert(0, node);
         }
 
         public static bool IsFileSystemNode(this TreeNode node)
@@ -84,12 +84,12 @@ namespace Yet_Another_Better_Search
                 case NameCriteria.Match:
                     if (criteria.UseRegex)
                     {
-                        return Regex.IsMatch(node.Name, criteria.NameText,
+                        return Regex.IsMatch(node.Text, criteria.NameText,
                             criteria.MatchCase ? RegexOptions.None : RegexOptions.IgnoreCase);
                     }
                     else
                     {
-                        return node.Name.IndexOf(criteria.NameText, criteria.MatchCase ?
+                        return node.Text.IndexOf(criteria.NameText, criteria.MatchCase ?
                             StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase) != -1;
                     }
             }
@@ -158,7 +158,7 @@ namespace Yet_Another_Better_Search
                 case SizeCriteria.LessThan:
                     return info.Length < criteria.FirstSize;
                 case SizeCriteria.GreaterThan:
-                    return info.Length > criteria.SecondSize;
+                    return info.Length > criteria.FirstSize;
                 case SizeCriteria.Between:
                     return info.Length >= criteria.FirstSize &&
                         info.Length <= criteria.SecondSize;

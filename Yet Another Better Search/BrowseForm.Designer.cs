@@ -218,6 +218,7 @@
             // 
             this.filterBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.filterBtn.Enabled = false;
             this.filterBtn.Location = new System.Drawing.Point(0, 0);
             this.filterBtn.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this.filterBtn.Name = "filterBtn";
@@ -231,6 +232,7 @@
             // 
             this.searchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.searchBtn.Enabled = false;
             this.searchBtn.Location = new System.Drawing.Point(288, 0);
             this.searchBtn.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.searchBtn.Name = "searchBtn";

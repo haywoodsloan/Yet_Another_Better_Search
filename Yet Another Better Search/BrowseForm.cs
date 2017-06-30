@@ -23,6 +23,18 @@ namespace Yet_Another_Better_Search
             public int Depth { get; set; }
         }
 
+        struct FilteredNode
+        {
+            public FilteredNode(TreeNode node, TreeNode parentNode)
+            {
+                Node = node;
+                ParentNode = parentNode;
+            }
+
+            public TreeNode Node { get; set; }
+            public TreeNode ParentNode { get; set; }
+        }
+
         public BrowseForm()
         {
             InitializeComponent();
@@ -72,6 +84,8 @@ namespace Yet_Another_Better_Search
 
                 browsing = true;
                 browseBtn.Text = "Stop";
+                filterBtn.Enabled = false;
+                searchBtn.Enabled = false;
 
                 if (resultTree.Nodes.Count > 0 &&
                     compareFilePaths(resultTree.Nodes[0].FullPath, rootPathText.Text))
@@ -101,12 +115,16 @@ namespace Yet_Another_Better_Search
                 browsing = false;
                 browseBtn.Text = "Browse";
                 browseBtn.Enabled = true;
+                filterBtn.Enabled = true;
+                searchBtn.Enabled = true;
 
                 GC.Collect();
             }
             else
             {
                 browseBtn.Enabled = false;
+                filterBtn.Enabled = false;
+                searchBtn.Enabled = false;
                 browsing = false;
             }
         }
@@ -141,6 +159,8 @@ namespace Yet_Another_Better_Search
 
                 browsing = true;
                 browseBtn.Text = "Stop";
+                filterBtn.Enabled = false;
+                searchBtn.Enabled = false;
 
                 TreeNodeCollection subNodes = await Task.Run(() =>
                     createNodeFor(getNodeFilePath(targetNode), 0).Nodes
@@ -149,6 +169,8 @@ namespace Yet_Another_Better_Search
                 browsing = false;
                 browseBtn.Text = "Browse";
                 browseBtn.Enabled = true;
+                filterBtn.Enabled = true;
+                searchBtn.Enabled = true;
 
                 targetNode.Nodes.Clear();
                 foreach (TreeNode subNode in subNodes)
@@ -159,11 +181,53 @@ namespace Yet_Another_Better_Search
                 GC.Collect();
             }
         }
-        
+
         private void filterBtn_OnClick(object sender, EventArgs e)
         {
             SearchCriteriaForm criteraForm = new SearchCriteriaForm(false);
-            criteraForm.ShowDialog(this);
+
+            if (filteredNodes.Count > 0)
+            {
+                filterBtn.Enabled = false;
+                searchBtn.Enabled = false;
+                resultTree.BeginUpdate();
+
+                unfilterNodes();
+
+                resultTree.EndUpdate();
+                filterBtn.Enabled = true;
+                searchBtn.Enabled = true;
+                filterBtn.Text = "Filter";
+            }
+            else
+            {
+                if (criteraForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    filterBtn.Enabled = false;
+                    searchBtn.Enabled = false;
+                    resultTree.BeginUpdate();
+
+                    if (!filterNode(resultTree.Nodes[0], criteraForm.GetSearchCriteria()))
+                    {
+                        foreach (TreeNode childNode in resultTree.Nodes[0].Nodes)
+                        {
+                            FilteredNode filteredNode = new FilteredNode(childNode, resultTree.Nodes[0]);
+                            filteredNodes.Add(filteredNode);
+                        }
+
+                        resultTree.Nodes[0].Nodes.Clear();
+                    }
+
+                    resultTree.EndUpdate();
+                    filterBtn.Enabled = true;
+                    searchBtn.Enabled = true;
+
+                    if (filteredNodes.Count > 0)
+                    {
+                        filterBtn.Text = "Unfilter";
+                    }
+                }
+            }
         }
 
         private void resultTree_OnMouseMove(object sender, MouseEventArgs e)
@@ -180,7 +244,7 @@ namespace Yet_Another_Better_Search
                 toolTip.ShowToolTip(hitTest.Node, e.Location);
             }
         }
-        
+
         private void resultTree_OnMouseLeave(object sender, EventArgs e)
         {
             toolTip.HideToolTip();
@@ -294,7 +358,7 @@ namespace Yet_Another_Better_Search
             List<Task<TreeNode>> createNodeTasks = new List<Task<TreeNode>>();
             foreach (string content in folderContents)
             {
-                if(!browsing)
+                if (!browsing)
                 {
                     rootNode.Nodes.Clear();
                     rootNode.Nodes.AddNodeSorted(createNotSearchedNode());
@@ -360,7 +424,53 @@ namespace Yet_Another_Better_Search
 
             return noAccess;
         }
-        
+
+        private bool filterNode(TreeNode rootNode, SearchCriteria criteria)
+        {
+            bool nodeMatch = rootNode.Tag == null ? false :
+                rootNode.CompareSearchCriteria(criteria);
+
+            if (rootNode.Nodes.Count > 0)
+            {
+                List<TreeNode> failedNodes = new List<TreeNode>();
+
+                foreach (TreeNode childNode in rootNode.Nodes)
+                {
+                    if (filterNode(childNode, criteria))
+                    {
+                        nodeMatch = true;
+                    }
+                    else
+                    {
+                        failedNodes.Add(childNode);
+                    }
+                }
+
+                if (nodeMatch && failedNodes.Count > 0)
+                {
+                    foreach (TreeNode failedNode in failedNodes)
+                    {
+                        FilteredNode filteredNode = new FilteredNode(failedNode, rootNode);
+                        filteredNodes.Add(filteredNode);
+
+                        rootNode.Nodes.Remove(failedNode);
+                    }
+                }
+            }
+
+            return nodeMatch;
+        }
+
+        private void unfilterNodes()
+        {
+            foreach(FilteredNode filteredNode in filteredNodes)
+            {
+                filteredNode.ParentNode.Nodes.AddNodeSorted(filteredNode.Node);
+            }
+
+            filteredNodes.Clear();
+        }
+
         public static bool compareFilePaths(string path1, string path2)
         {
             return getFilePath(path1).Equals(getFilePath(path2), StringComparison.InvariantCultureIgnoreCase);
@@ -378,6 +488,7 @@ namespace Yet_Another_Better_Search
         }
 
         private NodeToolTip toolTip;
+        private List<FilteredNode> filteredNodes = new List<FilteredNode>();
 
         private volatile bool browsing = false;
 
