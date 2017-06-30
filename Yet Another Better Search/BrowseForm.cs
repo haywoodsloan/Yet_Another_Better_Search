@@ -450,10 +450,13 @@ namespace Yet_Another_Better_Search
                 {
                     foreach (TreeNode failedNode in failedNodes)
                     {
-                        FilteredNode filteredNode = new FilteredNode(failedNode, rootNode);
-                        filteredNodes.Add(filteredNode);
+                        if (failedNode.Tag != null)
+                        {
+                            FilteredNode filteredNode = new FilteredNode(failedNode, rootNode);
+                            filteredNodes.Add(filteredNode);
 
-                        rootNode.Nodes.Remove(failedNode);
+                            rootNode.Nodes.Remove(failedNode);
+                        }
                     }
                 }
             }
@@ -463,7 +466,7 @@ namespace Yet_Another_Better_Search
 
         private void unfilterNodes()
         {
-            foreach(FilteredNode filteredNode in filteredNodes)
+            foreach (FilteredNode filteredNode in filteredNodes)
             {
                 filteredNode.ParentNode.Nodes.AddNodeSorted(filteredNode.Node);
             }

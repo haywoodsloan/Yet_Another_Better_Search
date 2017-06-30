@@ -148,7 +148,7 @@ namespace Yet_Another_Better_Search
 
             if(node.Tag.GetType() == typeof(MinimalDirectoryInfo))
             {
-                return false;
+                return true;
             }
 
             MinimalFileInfo info = (MinimalFileInfo)node.Tag;
